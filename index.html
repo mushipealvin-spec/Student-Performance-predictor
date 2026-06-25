@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Pass Predictor</title>
+    <!-- Student Pass Predictor (CSS) -->
+    <style>
+        /* General Container Styling */
+        .sp-container {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Example font */
+            background-color: #f8f9fa; /* Light background */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 800px; /* Max width for responsiveness */
+            margin: 40px auto; /* Center on page */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .sp-title {
+            color: #0056b3; /* Primary brand color */
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        /* Form Styling */
+        .sp-form-group {
+            margin-bottom: 20px;
+        }
+
+        .sp-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            font-size: 1.05em;
+        }
+
+        .sp-input[type="text"],
+        .sp-input[type="number"] {
+            width: calc(100% - 20px); /* Account for padding */
+            padding: 12px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        .sp-slider {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none; /* Remove default styling */
+            appearance: none;
+            margin-top: 10px;
+        }
+
+        .sp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff; /* Accent color */
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .sp-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Button Group */
+        .sp-button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        .sp-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            flex: 1; /* Distribute space evenly */
+            min-width: 150px; /* Minimum width for buttons */
+        }
+
+        .sp-btn-predict {
+            background-color: #28a745; /* Green for predict */
+            color: white;
+        }
+        .sp-btn-predict:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .sp-btn-clear {
+            background-color: #6c757d; /* Gray for clear */
+            color: white;
+        }
+        .sp-btn-clear:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .sp-btn-demo {
+            background-color: #007bff; /* Blue for demo */
+            color: white;
+        }
+        .sp-btn-demo:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .sp-btn-clear-history {
+            background-color: #dc3545; /* Red for clear history */
+            color: white;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+        }
+        .sp-btn-clear-history:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Result Display Card */
+        .sp-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .sp-card-title {
+            color: #0056b3;
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .sp-result-summary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .sp-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .sp-badge-pass {
+            background-color: #28a745; /* Green */
+        }
+
+        .sp-badge-fail {
+            background-color: #dc3545; /* Red */
+        }
+
+        #sp-probability {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Breakdown Bars */
+        .sp-breakdown {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #eee;
+        }
+
+        .sp-breakdown-title {
+            font-size: 1.3em;
+            color: #0056b3;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .sp-breakdown-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .sp-breakdown-label {
+            flex-basis: 35%; /* Adjust as needed */
+            font-weight: 500;
+            color: #666;
+        }
+
+        .sp-breakdown-bar-container {
+            flex-grow: 1;
+            background-color: #e9ecef;
+            height: 18px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .sp-breakdown-bar {
+            height: 100%;
+            background-color: #007bff; /* Default bar color */
+            width: 0%; /* Will be set by JS */
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 5px;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .sp-breakdown-bar-negative {
+            background-color: #dc3545; /* Red for negative impact */
+        }
+
+        /* History Table */
+        .sp-history-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .sp-history-title {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .sp-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .sp-history-table th,
+        .sp-history-table td {
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .sp-history-table th {
+            background-color: #e9ecef;
+            font-weight: bold;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .sp-history-table tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        .sp-history-table tbody tr:hover {
+            background-color: #e2e6ea;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .sp-container {
+                padding: 20px;
+                margin: 20px auto;
+            }
+
+            .sp-title {
+                font-size: 1.8em;
+            }
+
+            .sp-button-group {
+                flex-direction: column;
+            }
+
+            .sp-btn {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .sp-history-table th,
+            .sp-history-table td {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+            
+            .sp-breakdown-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .sp-breakdown-label {
+                flex-basis: auto;
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .sp-breakdown-bar-container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Student Pass Predictor (HTML) -->
+    <div id="student-predictor" class="sp-container">
+        <h2 class="sp-title">Student Pass Predictor</h2>
+
+        <form id="sp-predictor-form" class="sp-form">
+            <div class="sp-form-group">
+                <label for="studentName" class="sp-label">Student Name:</label>
+                <input type="text" id="studentName" class="sp-input" placeholder="Enter student's name">
+            </div>
+
+            <div class="sp-form-group">
+                <label for="attendance" class="sp-label">Attendance: <span id="sp-attendance-val">50%</span></label>
+                <input type="range" id="attendance" class="sp-slider" min="0" max="100" value="50">
+            </div>
+
+            <div class="sp-form-group">
+                <label for="studyHours" class="sp-label">Study Hours: <span id="sp-studyHours-val">6 hours</span></label>
+                <input type="range" id="studyHours" class="sp-slider" min="0" max="12" step="0.5" value="6">
+            </div>
+
+            <div class="sp-form-group">
+                <label for="internalMarks" class="sp-label">Internal Marks (0-50):</label>
+                <input type="number" id="internalMarks" class="sp-input" min="0" max="50" value="25">
+            </div>
+
+            <div class="sp-form-group">
+                <label for="assignmentScore" class="sp-label">Assignment Score (0-100):</label>
+                <input type="number" id="assignmentScore" class="sp-input" min="0" max="100" value="50">
+            </div>
+
+            <div class="sp-form-group">
+                <label for="prevGPA" class="sp-label">Previous GPA (0-10):</label>
+                <input type="number" id="prevGPA" class="sp-input" min="0" max="10" step="0.1" value="5.0">
+            </div>
+
+            <div class="sp-form-group">
+                <label for="backlogs" class="sp-label">Backlogs (0-10):</label>
+                <input type="number" id="backlogs" class="sp-input" min="0" max="10" value="0">
+            </div>
+
+            <div class="sp-button-group">
+                <button type="button" id="sp-predict-btn" class="sp-btn sp-btn-predict">Predict Result</button>
+                <button type="button" id="sp-clear-btn" class="sp-btn sp-btn-clear">Clear</button>
+                <button type="button" id="sp-demo-btn" class="sp-btn sp-btn-demo">Fill Demo Data</button>
+            </div>
+        </form>
+
+        <div id="sp-result-display" class="sp-card" style="display: none;">
+            <h3 class="sp-card-title">Prediction Result for <span id="sp-result-name"></span></h3>
+            <div class="sp-result-summary">
+                <span id="sp-result-badge" class="sp-badge"></span>
+                <span id="sp-probability"></span>
+            </div>
+            <div class="sp-breakdown">
+                <h4 class="sp-breakdown-title">Score Breakdown:</h4>
+                <div class="sp-breakdown-item">
+                    <span class="sp-breakdown-label">Attendance (30%)</span>
+                    <div class="sp-breakdown-bar-container"><div id="sp-bar-attendance" class="sp-breakdown-bar"></div></div>
+                </div>
+                <div class="sp-breakdown-item">
+                    <span class="sp-breakdown-label">Study Hours (25%)</span>
+                    <div class="sp-breakdown-bar-container"><div id="sp-bar-studyHours" class="sp-breakdown-bar"></div></div>
+                </div>
+                <div class="sp-breakdown-item">
+                    <span class="sp-breakdown-label">Internal Marks (20%)</span>
+                    <div class="sp-breakdown-bar-container"><div id="sp-bar-internalMarks" class="sp-breakdown-bar"></div></div>
+                </div>
+                <div class="sp-breakdown-item">
+                    <span class="sp-breakdown-label">Assignment Score (15%)</span>
+                    <div class="sp-breakdown-bar-container"><div id="sp-bar-assignmentScore" class="sp-breakdown-bar"></div></div>
+                </div>
+                <div class="sp-breakdown-item">
+                    <span class="sp-breakdown-label">Previous GPA (10%)</span>
+                    <div class="sp-breakdown-bar-container"><div id="sp-bar-prevGPA" class="sp-breakdown-bar"></div></div>
+                </div>
+                <div class="sp-breakdown-item">
+                    <span class="sp-breakdown-label">Backlogs (-5 per)</span>
+                    <div class="sp-breakdown-bar-container"><div id="sp-bar-backlogs" class="sp-breakdown-bar sp-breakdown-bar-negative"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sp-history-section">
+            <h3 class="sp-history-title">Prediction History</h3>
+            <table class="sp-history-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Result</th>
+                        <th>Probability</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="sp-prediction-history"></tbody>
+            </table>
+            <button type="button" id="sp-clear-history-btn" class="sp-btn sp-btn-clear-history">Clear History</button>
+        </div>
+    </div>
+
+    <!-- Student Pass Predictor (JavaScript) -->
+    <script>
+        // Namespace all logic within 'StudentPredictorApp' to avoid conflicts
+        const StudentPredictorApp = (() => {
+            // Get elements
+            const form = document.getElementById('sp-predictor-form');
+            const studentNameInput = document.getElementById('studentName');
+            const attendanceInput = document.getElementById('attendance');
+            const attendanceVal = document.getElementById('sp-attendance-val');
+            const studyHoursInput = document.getElementById('studyHours');
+            const studyHoursVal = document.getElementById('sp-studyHours-val');
+            const internalMarksInput = document.getElementById('internalMarks');
+            const assignmentScoreInput = document.getElementById('assignmentScore');
+            const prevGPAInput = document.getElementById('prevGPA');
+            const backlogsInput = document.getElementById('backlogs');
+
+            const predictBtn = document.getElementById('sp-predict-btn');
+            const clearBtn = document.getElementById('sp-clear-btn');
+            const demoBtn = document.getElementById('sp-demo-btn');
+            const clearHistoryBtn = document.getElementById('sp-clear-history-btn');
+
+            const resultDisplay = document.getElementById('sp-result-display');
+            const resultName = document.getElementById('sp-result-name');
+            const resultBadge = document.getElementById('sp-result-badge');
+            const probabilityDisplay = document.getElementById('sp-probability');
+
+            const barAttendance = document.getElementById('sp-bar-attendance');
+            const barStudyHours = document.getElementById('sp-bar-studyHours');
+            const barInternalMarks = document.getElementById('sp-bar-internalMarks');
+            const barAssignmentScore = document.getElementById('sp-bar-assignmentScore');
+            const barPrevGPA = document.getElementById('sp-bar-prevGPA');
+            const barBacklogs = document.getElementById('sp-bar-backlogs');
+            const predictionHistory = document.getElementById('sp-prediction-history');
+
+            // Original predictStudentResult function from requirements
+            function predictStudentResult() {
+                const attendance = parseFloat(attendanceInput.value);
+                const studyHours = parseFloat(studyHoursInput.value);
+                const internalMarks = parseFloat(internalMarksInput.value);
+                const assignmentScore = parseFloat(assignmentScoreInput.value);
+                const prevGPA = parseFloat(prevGPAInput.value);
+                const backlogs = parseFloat(backlogsInput.value);
+
+                // Calculate weighted score
+                let score = (attendance * 0.3) + (studyHours * 4 * 0.25) + (internalMarks * 2 * 0.2) + (assignmentScore * 0.15) + (prevGPA * 10 * 0.1) - (backlogs * 5);
+                score = Math.max(0, Math.min(100, score)); // Cap score between 0 and 100
+
+                const result = score >= 60 ? 'PASS' : 'FAIL';
+
+                return { result, probability: score.toFixed(1), score, attendance, studyHours, internalMarks, assignmentScore, prevGPA, backlogs };
+            }
+
+            function displayResult(prediction) {
+                resultName.textContent = studentNameInput.value || 'Student';
+                resultBadge.textContent = prediction.result;
+                probabilityDisplay.textContent = `${prediction.probability}% Likely`;
+
+                resultBadge.className = 'sp-badge'; // Reset classes
+                if (prediction.result === 'PASS') {
+                    resultBadge.classList.add('sp-badge-pass');
+                } else {
+                    resultBadge.classList.add('sp-badge-fail');
+                }
+
+                // Update breakdown bars (normalized to show contribution or raw value for display)
+                // Max possible score for each component, then scale for bar width
+                const maxAttendanceScore = 100 * 0.3; // 30
+                const maxStudyHoursScore = 12 * 4 * 0.25; // 12
+                const maxInternalMarksScore = 50 * 2 * 0.2; // 20
+                const maxAssignmentScore = 100 * 0.15; // 15
+                const maxPrevGPAScore = 10 * 10 * 0.1; // 10
+                const maxBacklogsPenalty = 10 * 5; // 50 (max negative impact)
+
+                // For bars, let's show impact relative to max possible for that factor
+                const attendanceImpact = (prediction.attendance * 0.3); // raw impact
+                const studyHoursImpact = (prediction.studyHours * 4 * 0.25); // raw impact
+                const internalMarksImpact = (prediction.internalMarks * 2 * 0.2); // raw impact
+                const assignmentScoreImpact = (prediction.assignmentScore * 0.15); // raw impact
+                const prevGPAImpact = (prediction.prevGPA * 10 * 0.1); // raw impact
+                const backlogsImpact = -(prediction.backlogs * 5); // raw impact (negative)
+
+                // Scale each impact to a percentage of its ideal contribution range
+                // For positive factors, scale against their max contribution
+                barAttendance.style.width = `${(attendanceImpact / maxAttendanceScore) * 100}%`;
+                barStudyHours.style.width = `${(studyHoursImpact / maxStudyHoursScore) * 100}%`;
+                barInternalMarks.style.width = `${(internalMarksImpact / maxInternalMarksScore) * 100}%`;
+                barAssignmentScore.style.width = `${(assignmentScoreImpact / maxAssignmentScore) * 100}%`;
+                barPrevGPA.style.width = `${(prevGPAImpact / maxPrevGPAScore) * 100}%`;
+
+                // For backlogs, it's a penalty. Scale it inversely or against a max penalty
+                // We'll show the bar length indicating how much of the max penalty is applied
+                barBacklogs.style.width = `${(Math.abs(backlogsImpact) / maxBacklogsPenalty) * 100}%`;
+                
+                // Optionally, add text to bars (e.g., actual value or impact)
+                barAttendance.textContent = `${prediction.attendance}%`;
+                barStudyHours.textContent = `${prediction.studyHours}h`;
+                barInternalMarks.textContent = `${prediction.internalMarks}`;
+                barAssignmentScore.textContent = `${prediction.assignmentScore}`;
+                barPrevGPA.textContent = `${prediction.prevGPA}`; 
+                barBacklogs.textContent = `${prediction.backlogs}`; // Display raw backlogs for negative bar
+
+                resultDisplay.style.display = 'block';
+            }
+
+            function addToHistory(prediction) {
+                const row = predictionHistory.insertRow();
+                row.insertCell().textContent = studentNameInput.value || 'N/A';
+                row.insertCell().textContent = prediction.result;
+                row.insertCell().textContent = `${prediction.probability}%`;
+                row.insertCell().textContent = new Date().toLocaleString();
+            }
+
+            function clearForm() {
+                form.reset();
+                attendanceVal.textContent = '50%'; // Reset slider displays
+                studyHoursVal.textContent = '6 hours';
+                resultDisplay.style.display = 'none'; // Hide result card
+                resetBreakdownBars();
+            }
+
+            function resetBreakdownBars() {
+                barAttendance.style.width = '0%';
+                barStudyHours.style.width = '0%';
+                barInternalMarks.style.width = '0%';
+                barAssignmentScore.style.width = '0%';
+                barPrevGPA.style.width = '0%';
+                barBacklogs.style.width = '0%';
+
+                barAttendance.textContent = '';
+                barStudyHours.textContent = '';
+                barInternalMarks.textContent = '';
+                barAssignmentScore.textContent = '';
+                barPrevGPA.textContent = '';
+                barBacklogs.textContent = '';
+            }
+
+            function fillDemoData() {
+                studentNameInput.value = 'Demo Student';
+                attendanceInput.value = 82;
+                studyHoursInput.value = 4.5;
+                internalMarksInput.value = 38;
+                assignmentScoreInput.value = 78;
+                prevGPAInput.value = 7.2;
+                backlogsInput.value = 1;
+                // Manually trigger slider value updates
+                attendanceInput.dispatchEvent(new Event('input'));
+                studyHoursInput.dispatchEvent(new Event('input'));
+            }
+            
+            function clearPredictionHistory() {
+                predictionHistory.innerHTML = '';
+            }
+
+            // Event Listeners
+            predictBtn.addEventListener('click', () => {
+                const prediction = predictStudentResult();
+                displayResult(prediction);
+                addToHistory(prediction);
+            });
+
+            clearBtn.addEventListener('click', clearForm);
+            demoBtn.addEventListener('click', fillDemoData);
+            clearHistoryBtn.addEventListener('click', clearPredictionHistory);
+
+            attendanceInput.addEventListener('input', () => {
+                attendanceVal.textContent = `${attendanceInput.value}%`;
+            });
+
+            studyHoursInput.addEventListener('input', () => {
+                studyHoursVal.textContent = `${studyHoursInput.value} hours`;
+            });
+
+            // Initialize default slider displays
+            attendanceInput.dispatchEvent(new Event('input'));
+            studyHoursInput.dispatchEvent(new Event('input'));
+
+            // Public API (if needed, though here all is self-contained)
+            return {};
+
+        })();
+    </script>
+</body>
+</html>
